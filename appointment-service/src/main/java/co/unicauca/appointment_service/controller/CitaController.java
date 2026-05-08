@@ -1,0 +1,72 @@
+package co.unicauca.appointment_service.controller;
+
+import co.unicauca.appointment_service.dto.AgendarAgendadorRequest;
+import co.unicauca.appointment_service.dto.AgendarPacienteRequest;
+import co.unicauca.appointment_service.dto.ReagendarRequest;
+import co.unicauca.appointment_service.service.AgendarAgendadorServicio;
+import co.unicauca.appointment_service.service.AgendarPacienteServicio;
+import co.unicauca.appointment_service.service.CancelarCitaServicio;
+import co.unicauca.appointment_service.service.ConsultarCitaServicio;
+import co.unicauca.appointment_service.service.HorarioSugeridoServicio;
+import co.unicauca.appointment_service.service.ReagendarCitaServicio;
+import java.time.LocalDate;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ *
+ * @author Juan Martin
+ */
+
+@RestController
+@RequestMapping("/citas")
+@RequiredArgsConstructor
+public class CitaController {
+    private final AgendarPacienteServicio pacienteServicio;
+    private final AgendarAgendadorServicio agendadorServicio;
+    private final CancelarCitaServicio cancelarServicio;
+    private final ReagendarCitaServicio reagendarServicio;
+    private final ConsultarCitaServicio consultarServicio;
+    private final HorarioSugeridoServicio horarioServicio;
+
+    @PostMapping("/agendar/paciente")
+    public ResponseEntity<?> agendarPaciente(@RequestBody AgendarPacienteRequest req){
+        return ResponseEntity.ok(pacienteServicio.agendar(req));
+    }
+
+    @PostMapping("/agendar/agendador")
+    public ResponseEntity<?> agendarAgendador(@RequestBody AgendarAgendadorRequest req){
+        return ResponseEntity.ok(agendadorServicio.agendar(req));
+    }
+
+    @GetMapping
+    public ResponseEntity<?> listar(){
+        return ResponseEntity.ok(consultarServicio.listar());
+    }
+
+    @PutMapping("/cancelar/{id}")
+    public ResponseEntity<?> cancelar(@PathVariable String id){
+        cancelarServicio.cancelar(id);
+        return ResponseEntity.ok("Cancelada");
+    }
+
+    @PutMapping("/reagendar/{id}")
+    public ResponseEntity<?> reagendar(@PathVariable String id,@RequestBody ReagendarRequest req){
+
+        reagendarServicio.reagendar(id, req);
+        return ResponseEntity.ok("Reagendada");
+    }
+
+    @GetMapping("/horarios")
+    public ResponseEntity<?> horarios(@RequestParam String especialistaId,@RequestParam LocalDate fecha){
+        return ResponseEntity.ok(horarioServicio.obtener(especialistaId, fecha));
+    }
+}
