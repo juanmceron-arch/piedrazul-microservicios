@@ -30,7 +30,7 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private TipoGenero genero;
     
-    private int telefono;
+    private String telefono;
     private LocalDate fechaNacimiento;
     private String correo;
 
@@ -85,11 +85,11 @@ public class Usuario {
         this.genero = genero;
     }
 
-    public int getTelefono() {
+    public String getTelefono() {
         return telefono;
     }
 
-    public void setTelefono(int telefono) {
+    public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
 

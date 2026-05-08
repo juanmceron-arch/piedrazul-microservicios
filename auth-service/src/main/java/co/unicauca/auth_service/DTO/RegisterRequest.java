@@ -14,7 +14,7 @@ public class RegisterRequest {
     private String passwordHash;
     private String rol;
     private String genero;
-    private int telefono;
+    private String telefono;
     private String fechaNacimiento;
     private String correo;
 
@@ -69,11 +69,11 @@ public class RegisterRequest {
         this.genero = genero;
     }
 
-    public int getTelefono() {
+    public String getTelefono() {
         return telefono;
     }
 
-    public void setTelefono(int telefono) {
+    public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
 
