@@ -30,7 +30,7 @@ public class SQLConexionBD {
                 )
             """);
             
-            // TABLA disponipilidad_especialista
+            // TABLA disponibilidad_especialista
             stmt.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS disponibilidad_especialista (
                     id TEXT PRIMARY KEY,
@@ -40,7 +40,7 @@ public class SQLConexionBD {
                     hora_fin TEXT NOT NULL,
                     intervalo_seg INTEGER NOT NULL,
                     num_semanas INTEGER NOT NULL,
-                    FOREIGN KEY (especialista_id) REFERENCES especialista(id)
+                    FOREIGN KEY (especialista_id) REFERENCES especialistas(id)
                 )
             """);
 

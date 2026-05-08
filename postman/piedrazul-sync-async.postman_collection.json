@@ -1,0 +1,94 @@
+{
+  "info": {
+    "name": "piedrazul-sync-async",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "SYNC - crear especialista",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"esp1\",\n  \"nombre\": \"Juan Perez\",\n  \"especialidad\": \"FISIOTERAPIA\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8083/api/especialistas",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8083",
+          "path": ["api", "especialistas"]
+        }
+      }
+    },
+    {
+      "name": "SYNC - consultar especialista",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8083/api/especialistas/esp1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8083",
+          "path": ["api", "especialistas", "esp1"]
+        }
+      }
+    },
+    {
+      "name": "SYNC - agendar cita por HTTP",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pacienteId\": \"pac1\",\n  \"pacienteNombre\": \"Ana\",\n  \"pacienteApellido\": \"Gomez\",\n  \"pacienteTelefono\": \"3000000000\",\n  \"pacienteGenero\": \"F\",\n  \"especialistaId\": \"esp1\",\n  \"especialistaNombre\": \"Juan Perez\",\n  \"especialistaEspecialidad\": \"FISIOTERAPIA\",\n  \"fecha\": \"2026-06-10\",\n  \"hora\": \"09:00:00\",\n  \"duracionMinutos\": 30\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8081/api/citas",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "citas"]
+        }
+      }
+    },
+    {
+      "name": "ASYNC - listar especialistas espejo en citas",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8081/api/citas/async/especialistas",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "citas", "async", "especialistas"]
+        }
+      }
+    },
+    {
+      "name": "ASYNC - agendar cita usando espejo",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pacienteId\": \"pac1\",\n  \"pacienteNombre\": \"Ana\",\n  \"pacienteApellido\": \"Gomez\",\n  \"pacienteTelefono\": \"3000000000\",\n  \"pacienteGenero\": \"F\",\n  \"especialistaId\": \"esp1\",\n  \"especialistaNombre\": \"Juan Perez\",\n  \"especialistaEspecialidad\": \"FISIOTERAPIA\",\n  \"fecha\": \"2026-06-11\",\n  \"hora\": \"09:00:00\",\n  \"duracionMinutos\": 30\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8081/api/citas/async",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "citas", "async"]
+        }
+      }
+    }
+  ]
+}

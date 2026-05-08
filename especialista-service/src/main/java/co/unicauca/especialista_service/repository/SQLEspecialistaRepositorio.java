@@ -28,14 +28,17 @@ public class SQLEspecialistaRepositorio implements EspecialistaRepositorio{
             ps.setString(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
-                Especialista especialista = new Especialista();
-                especialista.setId(rs.getString("id"));
-                especialista.setNombre(rs.getString("nombre"));
-                especialista.setEspecialidad(
-                        TipoEspecialista.valueOf(rs.getString("especialidad"))
-                );
+                if (rs.next()) {
+                    Especialista especialista = new Especialista();
+                    especialista.setId(rs.getString("id"));
+                    especialista.setNombre(rs.getString("nombre"));
+                    especialista.setEspecialidad(
+                            TipoEspecialista.valueOf(rs.getString("especialidad"))
+                    );
 
-                return especialista;
+                    return especialista;
+                }
+                return null;
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error buscando especialista", e);
