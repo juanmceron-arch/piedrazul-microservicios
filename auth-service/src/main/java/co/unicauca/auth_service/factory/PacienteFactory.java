@@ -7,10 +7,7 @@ import co.unicauca.auth_service.model.Usuario;
 import java.time.LocalDate;
 import org.springframework.stereotype.Component;
 
-/**
- *
- * @author Juan Martin
- */
+
 @Component
 public class PacienteFactory implements UsuarioFactory{
 

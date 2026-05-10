@@ -10,12 +10,8 @@ import co.unicauca.auth_service.repository.UsuarioRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/**
- *
- * @author Juan Martin
- */
 @Service
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
     private final UsuarioRepository repo;
     private final FactoryProducer factoryProducer;
     private final BCryptPasswordEncoder encoder;
@@ -28,11 +24,11 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public AuthResponse registrar(RegisterRequest request) {
-        
+
         if (repo.existsById(request.getId())) {
-            return new AuthResponse("Ya existe un usuario con ese documento",request.getId(),null,false);
+            return new AuthResponse("Ya existe un usuario con ese documento", request.getId(), null, false);
         }
-        
+
         UsuarioFactory factory = factoryProducer.getFactory(request.getRol());
 
         Usuario usuario = factory.crearUsuario(request);
@@ -41,8 +37,14 @@ public class AuthServiceImpl implements AuthService{
 
         Usuario guardado = repo.save(usuario);
 
-        return new AuthResponse("Usuario registrado",guardado.getId(),guardado.getRol().name(),true);
-}
+        return new AuthResponse(
+                "Usuario registrado",
+                guardado.getId(),
+                guardado.getRol().name(),
+                true,
+                guardado.getNombre(),
+                guardado.getApellido());
+    }
 
     @Override
     public AuthResponse login(LoginRequest request) {
@@ -50,20 +52,26 @@ public class AuthServiceImpl implements AuthService{
         return repo.findById(request.getId())
                 .map(usuario -> {
 
-                    boolean ok = encoder.matches(request.getPasswordHash(),usuario.getPasswordHash());
+                    boolean ok = encoder.matches(request.getPasswordHash(), usuario.getPasswordHash());
 
                     if (ok) {
-                        return new AuthResponse("Login exitoso",usuario.getId(),usuario.getRol().name(),true);
+                        return new AuthResponse(
+                                "Login exitoso",
+                                usuario.getId(),
+                                usuario.getRol().name(),
+                                true,
+                                usuario.getNombre(),
+                                usuario.getApellido());
                     }
 
-                    return new AuthResponse("Credenciales inválidas",0,null,false);
+                    return new AuthResponse("Credenciales inválidas", 0, null, false);
                 })
-                .orElse(new AuthResponse("Usuario no encontrado",0,null,false));
+                .orElse(new AuthResponse("Usuario no encontrado", 0, null, false));
     }
-    
+
     public Usuario obtenerPaciente(Integer id) {
 
-        Usuario usuario = repo.findById(id).orElseThrow(() ->new RuntimeException("Usuario no encontrado"));
+        Usuario usuario = repo.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (!usuario.getRol().name().equals("PACIENTE")) {
             throw new RuntimeException("El usuario no es paciente");

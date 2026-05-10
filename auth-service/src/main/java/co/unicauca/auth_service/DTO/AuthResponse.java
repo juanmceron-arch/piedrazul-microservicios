@@ -5,11 +5,13 @@ package co.unicauca.auth_service.DTO;
  * @author Juan Martin
  */
 public class AuthResponse {
-    
+
     private String mensaje;
     private int idUsuario;
     private String rolUsuario;
     private boolean autenticado;
+    private String nombreUsuario;
+    private String apellidoUsuario;
 
     public AuthResponse() {
     }
@@ -19,6 +21,15 @@ public class AuthResponse {
         this.idUsuario = idUsuario;
         this.rolUsuario = rolUsuario;
         this.autenticado = autenticado;
+    }
+
+    public AuthResponse(String mensaje, int idUsuario, String rolUsuario, boolean autenticado, String nombreUsuario, String apellidoUsuario) {
+        this.mensaje = mensaje;
+        this.idUsuario = idUsuario;
+        this.rolUsuario = rolUsuario;
+        this.autenticado = autenticado;
+        this.nombreUsuario = nombreUsuario;
+        this.apellidoUsuario = apellidoUsuario;
     }
 
     public String getMensaje() {
@@ -52,5 +63,20 @@ public class AuthResponse {
     public void setAutenticado(boolean autenticado) {
         this.autenticado = autenticado;
     }
-    
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+    }
+
+    public String getApellidoUsuario() {
+        return apellidoUsuario;
+    }
+
+    public void setApellidoUsuario(String apellidoUsuario) {
+        this.apellidoUsuario = apellidoUsuario;
+    }
 }
