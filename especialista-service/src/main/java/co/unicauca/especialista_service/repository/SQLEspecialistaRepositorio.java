@@ -28,6 +28,10 @@ public class SQLEspecialistaRepositorio implements EspecialistaRepositorio{
             ps.setString(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new RuntimeException("Especialista no encontrado: " + id);
+                }
+
                 Especialista especialista = new Especialista();
                 especialista.setId(rs.getString("id"));
                 especialista.setNombre(rs.getString("nombre"));
@@ -44,7 +48,7 @@ public class SQLEspecialistaRepositorio implements EspecialistaRepositorio{
 
     @Override
     public List<Especialista> listarEspecialistas() {
-    String sql = "SELECT * FROM especialistas ORDER BY nombre";
+        String sql = "SELECT * FROM especialistas ORDER BY nombre";
         List<Especialista> especialistas = new ArrayList<>();
 
         try (Connection conn = SQLConexionBD.SQLiteConexionBD();
@@ -53,20 +57,18 @@ public class SQLEspecialistaRepositorio implements EspecialistaRepositorio{
 
             while (rs.next()) {
                 Especialista especialista = new Especialista();
-                
                 especialista.setId(rs.getString("id"));
                 especialista.setNombre(rs.getString("nombre"));
                 especialista.setEspecialidad(
                         TipoEspecialista.valueOf(rs.getString("especialidad"))
                 );
-                
                 especialistas.add(especialista);
             }
 
             return especialistas;
         } catch (SQLException e) {
             throw new RuntimeException("Error listando especialistas", e);
-        }    
+        }
     }
 
     @Override
@@ -88,7 +90,4 @@ public class SQLEspecialistaRepositorio implements EspecialistaRepositorio{
             throw new RuntimeException("Error guardando especialista", e);
         }
     }
-    
-    
-    
 }

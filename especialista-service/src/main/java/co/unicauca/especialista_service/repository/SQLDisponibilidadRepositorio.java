@@ -23,29 +23,41 @@ public class SQLDisponibilidadRepositorio implements DisponibilidadRepositorio{
     public SQLDisponibilidadRepositorio(Connection connection) {
         this.connection = connection;
     }
-    
+
     @Override
     public void guardar(String id_especialista, DisponibilidadEspecialista disponibilidad) {
-        String sql = """
+        String deleteSql = "DELETE FROM disponibilidad_especialista WHERE especialista_id = ?";
+        String insertSql = """
            INSERT INTO disponibilidad_especialista
            (id, especialista_id, dias_atencion, hora_inicio, hora_fin, intervalo_seg, num_semanas)
            VALUES (?, ?, ?, ?, ?, ?, ?)
         """;
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try {
+            connection.setAutoCommit(false);
 
-            stmt.setString(1, java.util.UUID.randomUUID().toString());
-            stmt.setString(2, id_especialista);
-            stmt.setString(3, convertirDiasAString(disponibilidad.getDiasAtencion()));
-            stmt.setString(4, disponibilidad.getHoraInicio().toString());
-            stmt.setString(5, disponibilidad.getHoraFin().toString());
-            stmt.setInt(6, disponibilidad.getIntervaloMinutos());
-            stmt.setInt(7, disponibilidad.getSemanasHabilitadas());
+            try (PreparedStatement deleteStmt = connection.prepareStatement(deleteSql)) {
+                deleteStmt.setString(1, id_especialista);
+                deleteStmt.executeUpdate();
+            }
 
-            stmt.executeUpdate();
+            try (PreparedStatement insertStmt = connection.prepareStatement(insertSql)) {
+                insertStmt.setString(1, java.util.UUID.randomUUID().toString());
+                insertStmt.setString(2, id_especialista);
+                insertStmt.setString(3, convertirDiasAString(disponibilidad.getDiasAtencion()));
+                insertStmt.setString(4, disponibilidad.getHoraInicio().toString());
+                insertStmt.setString(5, disponibilidad.getHoraFin().toString());
+                insertStmt.setInt(6, disponibilidad.getIntervaloMinutos());
+                insertStmt.setInt(7, disponibilidad.getSemanasHabilitadas());
+                insertStmt.executeUpdate();
+            }
 
+            connection.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            try { connection.rollback(); } catch (SQLException ignored) { }
+            throw new RuntimeException("Error guardando disponibilidad", e);
+        } finally {
+            try { connection.setAutoCommit(true); } catch (SQLException ignored) { }
         }
     }
 
@@ -54,59 +66,36 @@ public class SQLDisponibilidadRepositorio implements DisponibilidadRepositorio{
         String sql = """
             SELECT * FROM disponibilidad_especialista
             WHERE especialista_id = ?
+            LIMIT 1
         """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setString(1, id_especialista);
 
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-
-                DisponibilidadEspecialista disponibilidad = new DisponibilidadEspecialista();
-
-                disponibilidad.setDiasAtencion(
-                        convertirStringADias(rs.getString("dias_atencion"))
-                );
-
-                disponibilidad.setHoraInicio(
-                        LocalTime.parse(rs.getString("hora_inicio"))
-                );
-
-                disponibilidad.setHoraFin(
-                        LocalTime.parse(rs.getString("hora_fin"))
-                );
-
-                disponibilidad.setIntervaloMinutos(
-                        rs.getInt("intervalo_seg")
-                );
-
-                disponibilidad.setSemanasHabilitadas(
-                        rs.getInt("num_semanas")
-                );
-
-                return disponibilidad;
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    DisponibilidadEspecialista disponibilidad = new DisponibilidadEspecialista();
+                    disponibilidad.setDiasAtencion(convertirStringADias(rs.getString("dias_atencion")));
+                    disponibilidad.setHoraInicio(LocalTime.parse(rs.getString("hora_inicio")));
+                    disponibilidad.setHoraFin(LocalTime.parse(rs.getString("hora_fin")));
+                    disponibilidad.setIntervaloMinutos(rs.getInt("intervalo_seg"));
+                    disponibilidad.setSemanasHabilitadas(rs.getInt("num_semanas"));
+                    return disponibilidad;
+                }
             }
-
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error consultando disponibilidad", e);
         }
 
         return null;
     }
-    
+
     private String convertirDiasAString(List<DayOfWeek> dias) {
-        return String.join(",",
-                dias.stream()
-                        .map(Enum::name)
-                        .toList());
+        return String.join(",", dias.stream().map(Enum::name).toList());
     }
-    
+
     private List<DayOfWeek> convertirStringADias(String texto) {
-        return Arrays.stream(texto.split(","))
-                .map(DayOfWeek::valueOf)
-                .toList();
+        return Arrays.stream(texto.split(",")).map(DayOfWeek::valueOf).toList();
     }
-    
 }
