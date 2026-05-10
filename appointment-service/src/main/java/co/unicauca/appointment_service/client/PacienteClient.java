@@ -1,5 +1,6 @@
 package co.unicauca.appointment_service.client;
 
+import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -15,10 +16,11 @@ public class PacienteClient {
         this.restTemplate = restTemplate;
     }
 
-    public Object obtenerPaciente(int id) {
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> obtenerPaciente(int id) {
         return restTemplate.getForObject(
                 "http://localhost:8080/auth/pacientes/" + id,
-                Object.class
+                Map.class
         );
     }
 }

@@ -6,6 +6,8 @@ import co.unicauca.appointment_service.dto.AgendarPacienteRequest;
 import co.unicauca.appointment_service.model.Cita;
 import co.unicauca.appointment_service.model.EstadoCita;
 import co.unicauca.appointment_service.repository.CitaRepository;
+import java.time.LocalDate;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -19,31 +21,25 @@ public class AgendarPacienteServicio {
     private final PacienteClient pacienteClient;
     private final EspecialistaClient especialistaClient;
 
-    public AgendarPacienteServicio(CitaRepository repo,PacienteClient pacienteClient,EspecialistaClient especialistaClient) {
+    public AgendarPacienteServicio(CitaRepository repo, PacienteClient pacienteClient, EspecialistaClient especialistaClient) {
         this.repo = repo;
         this.pacienteClient = pacienteClient;
         this.especialistaClient = especialistaClient;
     }
 
     public Cita agendar(AgendarPacienteRequest req) {
+        validarFecha(req.getFecha());
+        validarHorarioLibre(req.getEspecialistaId(), req.getFecha(), req.getHora());
 
-        if(repo.existsByEspecialistaIdAndFechaAndHora(
-                req.getEspecialistaId(),
-                req.getFecha(),
-                req.getHora()
-        )) {
-            throw new RuntimeException("Horario ocupado");
-        }
-
-        pacienteClient.obtenerPaciente(req.getPacienteId());
-        especialistaClient.obtenerEspecialista(req.getEspecialistaId());
+        Map<String, Object> paciente = pacienteClient.obtenerPaciente(req.getPacienteId());
+        Map<String, Object> especialista = especialistaClient.obtenerEspecialista(req.getEspecialistaId());
 
         Cita cita = new Cita(
                 UUID.randomUUID().toString(),
                 req.getPacienteId(),
-                "Paciente",
+                nombreCompleto(paciente),
                 req.getEspecialistaId(),
-                "Especialista",
+                valorComoTexto(especialista, "nombre", "Especialista"),
                 req.getFecha(),
                 req.getHora(),
                 60,
@@ -51,5 +47,28 @@ public class AgendarPacienteServicio {
         );
 
         return repo.save(cita);
+    }
+
+    private void validarHorarioLibre(String especialistaId, LocalDate fecha, java.time.LocalTime hora) {
+        if (repo.existsByEspecialistaIdAndFechaAndHoraAndEstadoNot(especialistaId, fecha, hora, EstadoCita.CANCELADA)) {
+            throw new RuntimeException("Horario ocupado");
+        }
+    }
+
+    private void validarFecha(LocalDate fecha) {
+        if (fecha != null && fecha.isBefore(LocalDate.now())) {
+            throw new RuntimeException("No se pueden agendar citas en fechas pasadas");
+        }
+    }
+
+    private String nombreCompleto(Map<String, Object> paciente) {
+        String nombre = valorComoTexto(paciente, "nombre", "Paciente");
+        String apellido = valorComoTexto(paciente, "apellido", "");
+        return (nombre + " " + apellido).trim();
+    }
+
+    private String valorComoTexto(Map<String, Object> map, String key, String fallback) {
+        if (map == null || map.get(key) == null) return fallback;
+        return String.valueOf(map.get(key));
     }
 }
