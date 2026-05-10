@@ -5,10 +5,7 @@ import co.unicauca.auth_service.model.TipoUsuario;
 import co.unicauca.auth_service.model.Usuario;
 import org.springframework.stereotype.Component;
 
-/**
- *
- * @author Juan Martin
- */
+
 @Component
 public class AgendadorFactory implements UsuarioFactory{
 

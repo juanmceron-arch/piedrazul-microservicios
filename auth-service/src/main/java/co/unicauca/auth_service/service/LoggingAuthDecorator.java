@@ -4,10 +4,7 @@ import co.unicauca.auth_service.DTO.AuthResponse;
 import co.unicauca.auth_service.DTO.LoginRequest;
 import co.unicauca.auth_service.DTO.RegisterRequest;
 
-/**
- *
- * @author Juan Martin
- */
+
 public class LoggingAuthDecorator extends AuthDecorator {
     
     public LoggingAuthDecorator(AuthService authService) {

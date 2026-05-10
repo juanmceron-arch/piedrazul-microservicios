@@ -6,6 +6,7 @@ import co.unicauca.auth_service.service.LoggingAuthDecorator;
 import co.unicauca.auth_service.service.ValidationAuthDecorator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 /**
  *
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AuthConfig {
     @Bean
+    @Primary
     public AuthService authService(AuthServiceImpl baseService) {
 
         return new LoggingAuthDecorator(

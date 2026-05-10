@@ -4,7 +4,7 @@ import co.unicauca.auth_service.DTO.AuthResponse;
 import co.unicauca.auth_service.DTO.LoginRequest;
 import co.unicauca.auth_service.DTO.RegisterRequest;
 import co.unicauca.auth_service.model.Usuario;
-import co.unicauca.auth_service.service.AuthServiceImpl;
+import co.unicauca.auth_service.service.AuthService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,17 +12,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- *
- * @author Juan Martin
- */
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
     
-    private final AuthServiceImpl service;
+    private final AuthService service;
 
-    public AuthController(AuthServiceImpl service) {
+    public AuthController(AuthService service) {
         this.service = service;
     }
 

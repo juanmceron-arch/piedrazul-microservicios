@@ -7,10 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 
-/**
- *
- * @author Juan Martin
- */
+
 
 @Entity
 @Table(name = "usuario")

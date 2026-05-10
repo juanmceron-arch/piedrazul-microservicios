@@ -1,9 +1,6 @@
 package co.unicauca.auth_service.DTO;
 
-/**
- *
- * @author Juan Martin
- */
+
 public class LoginRequest {
     private int id;
     private String passwordHash;

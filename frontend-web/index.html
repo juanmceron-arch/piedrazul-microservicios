@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema Piedrazul - Gestión de Citas</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>Sistema<br />Piedrazul</h1>
+        <p>Gestión de Citas</p>
+      </div>
+
+      <nav class="nav">
+        <a href="#/inicio" class="nav-link" data-route="inicio" data-roles="AGENDADOR,PACIENTE">
+          <span>⌂</span> Inicio
+        </a>
+
+        <a href="#/login" class="nav-link" data-route="login" data-public="true">
+          <span>↪</span> Iniciar sesión
+        </a>
+
+        <p class="nav-title" data-roles="AGENDADOR">Gestión manual de citas</p>
+
+        <a href="#/agendar-cita" class="nav-link" data-route="agendar-cita" data-roles="AGENDADOR">
+          <span>▣</span> Agendar cita
+        </a>
+
+        <a href="#/consultar-citas" class="nav-link" data-route="consultar-citas" data-roles="AGENDADOR">
+          <span>▤</span> Consultar citas
+        </a>
+
+        <button type="button" class="nav-link nav-button" id="exportAppointments" data-roles="AGENDADOR">
+          <span>⇩</span> Exportar citas
+        </button>
+
+        <p class="nav-title" data-roles="AGENDADOR">Gestión de médicos</p>
+
+        <a href="#/registrar-medico" class="nav-link" data-route="registrar-medico" data-roles="AGENDADOR">
+          <span>♙</span> Registrar médico
+        </a>
+
+        <a href="#/dias-atencion" class="nav-link" data-route="dias-atencion" data-roles="AGENDADOR">
+          <span>▦</span> Días de atención
+        </a>
+
+        <a href="#/citas-medico" class="nav-link" data-route="citas-medico" data-roles="AGENDADOR">
+          <span>▧</span> Mis citas (médico)
+        </a>
+
+        <a href="#/intervalo-citas" class="nav-link" data-route="intervalo-citas" data-roles="AGENDADOR">
+          <span>⚙</span> Intervalo citas
+        </a>
+
+        <a href="#/ventana-agendamiento" class="nav-link" data-route="ventana-agendamiento" data-roles="AGENDADOR">
+          <span>⚙</span> Ventana agendamiento
+        </a>
+
+        <p class="nav-title" data-roles="PACIENTE">Portal del paciente</p>
+
+        <a href="#/portal-agendar" class="nav-link" data-route="portal-agendar" data-roles="PACIENTE">
+          <span>▣</span> Agendar mi cita
+        </a>
+
+        <a href="#/mis-citas" class="nav-link" data-route="mis-citas" data-roles="PACIENTE">
+          <span>♙</span> Mis citas
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <p id="sidebarUser">Usuario: Sin sesión</p>
+        <button type="button" class="btn btn-small" id="logoutButton">Cerrar sesión</button>
+        <p>v1.0.0</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div id="alertRoot" class="alert-root"></div>
+      <section id="viewRoot"></section>
+    </main>
+  </div>
+
+  <div id="modalRoot" class="modal-root hidden" aria-hidden="true"></div>
+
+  <template id="emptyStateTemplate">
+    <div class="empty-state">
+      <strong>No hay información para mostrar</strong>
+      <p>Verifique los filtros o registre nuevos datos.</p>
+    </div>
+  </template>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
