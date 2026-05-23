@@ -4,7 +4,6 @@ import co.unicauca.especialista_service.DTO.CrearEspecialistaDto;
 import co.unicauca.especialista_service.model.TipoEspecialista;
 import co.unicauca.especialista_service.model.Especialista;
 import co.unicauca.especialista_service.service.EspecialistaService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -13,7 +12,7 @@ import java.util.List;
  * @author Juan Martin
  */
 @RestController
-@RequestMapping({"/especialistas", "/api/especialistas"})
+@RequestMapping("/especialistas")
 public class EspecialistaController {
     private final EspecialistaService service;
 
@@ -41,12 +40,8 @@ public class EspecialistaController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Especialista> buscar(@PathVariable String id) {
-        Especialista especialista = service.buscarEspecialista(id);
-        if (especialista == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(especialista);
+    public Especialista buscar(@PathVariable String id) {
+        return service.buscarEspecialista(id);
     }
     
     

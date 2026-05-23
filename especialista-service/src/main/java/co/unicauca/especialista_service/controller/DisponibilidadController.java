@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Juan Martin
  */
 @RestController
-@RequestMapping({"/disponibilidad", "/api/disponibilidad"})
+@RequestMapping("/disponibilidad")
 public class DisponibilidadController {
     
     private final DisponibilidadService service;

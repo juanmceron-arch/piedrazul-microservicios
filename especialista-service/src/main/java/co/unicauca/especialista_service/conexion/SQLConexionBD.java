@@ -30,7 +30,7 @@ public class SQLConexionBD {
                 )
             """);
             
-            // TABLA disponibilidad_especialista
+            // TABLA disponipilidad_especialista
             stmt.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS disponibilidad_especialista (
                     id TEXT PRIMARY KEY,

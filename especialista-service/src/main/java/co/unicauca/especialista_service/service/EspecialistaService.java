@@ -1,10 +1,8 @@
 package co.unicauca.especialista_service.service;
 
-import co.unicauca.especialista_service.infra.event.EspecialistaEventoPublicador;
 import java.util.List;
 import co.unicauca.especialista_service.model.Especialista;
 import co.unicauca.especialista_service.repository.EspecialistaRepositorio;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,9 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class EspecialistaService {
     private final EspecialistaRepositorio repositorio;
-
-    @Autowired(required = false)
-    private EspecialistaEventoPublicador eventoPublicador;
 
     public EspecialistaService(EspecialistaRepositorio repositorio) {
         this.repositorio = repositorio;
@@ -37,10 +32,6 @@ public class EspecialistaService {
         }
 
         repositorio.guardar(especialista);
-
-        if (eventoPublicador != null) {
-            eventoPublicador.publicarEspecialistaCreado(especialista);
-        }
     }
 
     public Especialista buscarEspecialista(String id) {
