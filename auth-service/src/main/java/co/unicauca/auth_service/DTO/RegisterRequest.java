@@ -2,10 +2,7 @@ package co.unicauca.auth_service.DTO;
 
 import java.time.LocalDate;
 
-/**
- *
- * @author Juan Martin
- */
+
 public class RegisterRequest {
     
     private int id;
