@@ -1,38 +1,48 @@
 package co.unicauca.appointment_service.service;
 
+import co.unicauca.appointment_service.client.EspecialistaGateway;
 import co.unicauca.appointment_service.dto.AgendarAgendadorRequest;
 import co.unicauca.appointment_service.model.Cita;
-import co.unicauca.appointment_service.model.EstadoCita;
 import co.unicauca.appointment_service.repository.CitaRepository;
-import java.util.UUID;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 
 /**
+ * Subclase concreta del Template Method para el agendamiento manual
+ * realizado por el agendador.
  *
  * @author Juan Martin
  */
 @Service
-public class AgendarAgendadorServicio {
-    private final CitaRepository repo;
+public class AgendarAgendadorServicio extends AgendarCitaTemplate {
 
-    public AgendarAgendadorServicio(CitaRepository repo) {
-        this.repo = repo;
+    private final EspecialistaGateway especialistaClient;
+
+    public AgendarAgendadorServicio(CitaRepository repo, EspecialistaGateway especialistaClient) {
+        super(repo);
+        this.especialistaClient = especialistaClient;
     }
 
     public Cita agendar(AgendarAgendadorRequest req) {
-
-        Cita cita = new Cita(
-                UUID.randomUUID().toString(),
+        return agendarCita(
                 req.getPacienteId(),
                 req.getNombrePaciente(),
+                req.getApellidoPaciente(),
                 req.getEspecialistaId(),
-                "Especialista",
                 req.getFecha(),
-                req.getHora(),
-                60,
-                EstadoCita.AGENDADA
+                req.getHora()
         );
+    }
 
-        return repo.save(cita);
+    @Override
+    protected String resolverNombrePaciente(int pacienteId, String nombre, String apellido) {
+        return (String.valueOf(nombre == null ? "" : nombre) + " "
+                + String.valueOf(apellido == null ? "" : apellido)).trim();
+    }
+
+    @Override
+    protected String resolverNombreEspecialista(String especialistaId) {
+        Map<String, Object> especialista = especialistaClient.obtenerEspecialista(especialistaId);
+        return valorComoTexto(especialista, "nombre", "Especialista");
     }
 }

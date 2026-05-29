@@ -4,22 +4,18 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-/**
- *
- * @author Juan Martin
- */
 @Component
-public class PacienteClient {
+public class DisponibilidadClient {
     private final RestTemplate restTemplate;
 
-    public PacienteClient(RestTemplate restTemplate) {
+    public DisponibilidadClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> obtenerPaciente(int id) {
+    public Map<String, Object> obtenerDisponibilidad(String especialistaId) {
         return restTemplate.getForObject(
-                "http://localhost:8080/auth/pacientes/" + id,
+                "http://localhost:8081/disponibilidad/" + especialistaId,
                 Map.class
         );
     }
