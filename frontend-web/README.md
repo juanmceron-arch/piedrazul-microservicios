@@ -43,4 +43,4 @@ http://localhost:5500
 
 - Este frontend ya no usa datos demo ni datos mock.
 - Si un microservicio está apagado, la pantalla mostrará el error real y no inventará registros locales.
-- Las especialidades disponibles coinciden con el enum actual del backend: `MEDICINA_GENERAL`, `FISIOTERAPIA`, `PSICOLOGIA`.
+- Las especialidades disponibles coinciden con el enum actual del backend: `CONSULTA_GENERAL`, `TERAPIA_NEURAL`, `QUIROPRAXIA`, `FISIOTERAPIA`.

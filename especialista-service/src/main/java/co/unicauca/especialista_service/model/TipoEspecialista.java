@@ -5,7 +5,10 @@ package co.unicauca.especialista_service.model;
  * @author Juan Martin
  */
 public enum TipoEspecialista {
-    MEDICINA_GENERAL,
+    CONSULTA_GENERAL,
+    TERAPIA_NEURAL,
+    QUIROPRAXIA,
     FISIOTERAPIA,
+    MEDICINA_GENERAL,
     PSICOLOGIA
 }

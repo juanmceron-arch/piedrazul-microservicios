@@ -3,8 +3,10 @@ package co.unicauca.appointment_service.controller;
 import co.unicauca.appointment_service.dto.AgendarAgendadorRequest;
 import co.unicauca.appointment_service.dto.AgendarPacienteRequest;
 import co.unicauca.appointment_service.dto.ReagendarRequest;
+import co.unicauca.appointment_service.model.EstadoCita;
 import co.unicauca.appointment_service.service.AgendarAgendadorServicio;
 import co.unicauca.appointment_service.service.AgendarPacienteServicio;
+import co.unicauca.appointment_service.service.CambiarEstadoCitaServicio;
 import co.unicauca.appointment_service.service.CancelarCitaServicio;
 import co.unicauca.appointment_service.service.ConsultarCitaServicio;
 import co.unicauca.appointment_service.service.HorarioSugeridoServicio;
@@ -33,6 +35,7 @@ public class CitaController {
     private final AgendarPacienteServicio pacienteServicio;
     private final AgendarAgendadorServicio agendadorServicio;
     private final CancelarCitaServicio cancelarServicio;
+    private final CambiarEstadoCitaServicio cambiarEstadoServicio;
     private final ReagendarCitaServicio reagendarServicio;
     private final ConsultarCitaServicio consultarServicio;
     private final HorarioSugeridoServicio horarioServicio;
@@ -58,11 +61,15 @@ public class CitaController {
         return ResponseEntity.ok("Cancelada");
     }
 
+    @PutMapping("/{id}/estado")
+    public ResponseEntity<?> cambiarEstado(@PathVariable String id, @RequestParam EstadoCita estado){
+        return ResponseEntity.ok(cambiarEstadoServicio.cambiar(id, estado));
+    }
+
     @PutMapping("/reagendar/{id}")
     public ResponseEntity<?> reagendar(@PathVariable String id,@RequestBody ReagendarRequest req){
 
-        reagendarServicio.reagendar(id, req);
-        return ResponseEntity.ok("Reagendada");
+        return ResponseEntity.ok(reagendarServicio.reagendar(id, req));
     }
 
     @GetMapping("/horarios")

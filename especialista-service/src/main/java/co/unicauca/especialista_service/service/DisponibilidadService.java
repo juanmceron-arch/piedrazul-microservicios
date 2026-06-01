@@ -40,8 +40,11 @@ public class DisponibilidadService {
             return false;
         }
 
-        if (disponibilidad.getHoraInicio()
-                .isAfter(disponibilidad.getHoraFin())) {
+        if (disponibilidad.getHoraInicio() == null || disponibilidad.getHoraFin() == null) {
+            return false;
+        }
+
+        if (!disponibilidad.getHoraInicio().isBefore(disponibilidad.getHoraFin())) {
             return false;
         }
 
@@ -49,7 +52,7 @@ public class DisponibilidadService {
             return false;
         }
 
-        if (disponibilidad.getDiasAtencion().isEmpty()) {
+        if (disponibilidad.getDiasAtencion() == null || disponibilidad.getDiasAtencion().isEmpty()) {
             return false;
         }
 

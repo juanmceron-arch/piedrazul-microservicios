@@ -17,7 +17,7 @@ public class AgendarAgendadorRequest {
     private int pacienteId;
     private String nombrePaciente;
     private String apellidoPaciente;
-    private int telefono;
+    private String telefono;
     private LocalDate fechaNacimiento;
     private String correo;
     

@@ -26,7 +26,7 @@ public class HorarioSugeridoServicio {
     }
 
     public List<LocalTime> obtener(String especialistaId, LocalDate fecha) {
-        if (fecha == null || fecha.isBefore(LocalDate.now())) {
+        if (fecha == null || !fecha.isAfter(LocalDate.now())) {
             return List.of();
         }
 

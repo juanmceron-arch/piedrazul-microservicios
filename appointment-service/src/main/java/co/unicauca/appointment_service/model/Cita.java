@@ -23,9 +23,17 @@ public class Cita {
 
     private int pacienteId;
     private String pacienteNombre;
+    private String pacienteApellido;
+    private String pacienteTelefono;
+    private LocalDate pacienteFechaNacimiento;
+    private String pacienteCorreo;
+
+    @Enumerated(EnumType.STRING)
+    private TipoGenero pacienteGenero;
 
     private String especialistaId;
     private String especialistaNombre;
+    private String especialistaEspecialidad;
 
     private LocalDate fecha;
     private LocalTime hora;

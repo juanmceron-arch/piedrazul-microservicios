@@ -2,8 +2,9 @@ package co.unicauca.auth_service.service;
 
 import co.unicauca.auth_service.DTO.AuthResponse;
 import co.unicauca.auth_service.DTO.LoginRequest;
+import co.unicauca.auth_service.DTO.PacienteResponse;
 import co.unicauca.auth_service.DTO.RegisterRequest;
-import co.unicauca.auth_service.model.Usuario;
+import java.util.List;
 
 
 public abstract class AuthDecorator implements AuthService{
@@ -25,8 +26,13 @@ public abstract class AuthDecorator implements AuthService{
     }
 
     @Override
-    public Usuario obtenerPaciente(Integer id) {
+    public PacienteResponse obtenerPaciente(Integer id) {
         return authService.obtenerPaciente(id);
+    }
+
+    @Override
+    public List<PacienteResponse> buscarPacientes(String documento) {
+        return authService.buscarPacientes(documento);
     }
     
 }

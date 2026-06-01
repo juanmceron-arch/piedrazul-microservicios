@@ -2,8 +2,9 @@ package co.unicauca.auth_service.service;
 
 import co.unicauca.auth_service.DTO.AuthResponse;
 import co.unicauca.auth_service.DTO.LoginRequest;
+import co.unicauca.auth_service.DTO.PacienteResponse;
 import co.unicauca.auth_service.DTO.RegisterRequest;
-import co.unicauca.auth_service.model.Usuario;
+import java.util.List;
 
 public interface AuthService {
 
@@ -11,5 +12,7 @@ public interface AuthService {
 
     AuthResponse login(LoginRequest request);
 
-    Usuario obtenerPaciente(Integer id);
+    PacienteResponse obtenerPaciente(Integer id);
+
+    List<PacienteResponse> buscarPacientes(String documento);
 }

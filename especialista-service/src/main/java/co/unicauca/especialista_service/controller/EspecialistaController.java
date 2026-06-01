@@ -22,11 +22,14 @@ public class EspecialistaController {
     
     @PostMapping
     public String crearEspecialista(@RequestBody CrearEspecialistaDto dto) {
+        if (dto.getEspecialidad() == null || dto.getEspecialidad().isBlank()) {
+            throw new IllegalArgumentException("Especialidad requerida");
+        }
 
         Especialista especialista = new Especialista(
                 dto.getId(),
                 dto.getNombre(),
-                TipoEspecialista.valueOf(dto.getEspecialidad())
+                TipoEspecialista.valueOf(dto.getEspecialidad().trim().toUpperCase())
         );
 
         service.crearEspecialista(especialista);

@@ -2,11 +2,14 @@ package co.unicauca.auth_service.service;
 
 import co.unicauca.auth_service.DTO.AuthResponse;
 import co.unicauca.auth_service.DTO.LoginRequest;
+import co.unicauca.auth_service.DTO.PacienteResponse;
 import co.unicauca.auth_service.DTO.RegisterRequest;
 import co.unicauca.auth_service.factory.FactoryProducer;
 import co.unicauca.auth_service.factory.UsuarioFactory;
 import co.unicauca.auth_service.model.Usuario;
 import co.unicauca.auth_service.repository.UsuarioRepository;
+import java.text.Normalizer;
+import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +35,8 @@ public class AuthServiceImpl implements AuthService {
         UsuarioFactory factory = factoryProducer.getFactory(request.getRol());
 
         Usuario usuario = factory.crearUsuario(request);
+        usuario.setNombre(normalizarNombre(usuario.getNombre()));
+        usuario.setApellido(normalizarNombre(usuario.getApellido()));
 
         usuario.setPasswordHash(encoder.encode(usuario.getPasswordHash()));
 
@@ -69,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElse(new AuthResponse("Usuario no encontrado", 0, null, false));
     }
 
-    public Usuario obtenerPaciente(Integer id) {
+    public PacienteResponse obtenerPaciente(Integer id) {
 
         Usuario usuario = repo.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -77,6 +82,68 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("El usuario no es paciente");
         }
 
-        return usuario;
+        return new PacienteResponse(
+                usuario.getId(),
+                usuario.getNombre(),
+                usuario.getApellido(),
+                usuario.getGenero(),
+                usuario.getTelefono(),
+                usuario.getFechaNacimiento(),
+                usuario.getCorreo()
+        );
+    }
+
+    @Override
+    public List<PacienteResponse> buscarPacientes(String documento) {
+        String prefijo = String.valueOf(documento == null ? "" : documento).replaceAll("\\D", "");
+
+        if (prefijo.length() < 3) {
+            return List.of();
+        }
+
+        return repo.buscarPacientesPorPrefijoDocumento(prefijo).stream()
+                .map(this::toPacienteResponse)
+                .toList();
+    }
+
+    private PacienteResponse toPacienteResponse(Usuario usuario) {
+        return new PacienteResponse(
+                usuario.getId(),
+                usuario.getNombre(),
+                usuario.getApellido(),
+                usuario.getGenero(),
+                usuario.getTelefono(),
+                usuario.getFechaNacimiento(),
+                usuario.getCorreo()
+        );
+    }
+
+    private String normalizarNombre(String valor) {
+        if (valor == null) {
+            return null;
+        }
+
+        String sinTildes = Normalizer.normalize(valor, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+        String limpio = sinTildes.trim().replaceAll("\\s+", " ").toLowerCase();
+
+        if (limpio.isBlank()) {
+            return limpio;
+        }
+
+        String[] partes = limpio.split(" ");
+        StringBuilder resultado = new StringBuilder();
+
+        for (String parte : partes) {
+            if (resultado.length() > 0) {
+                resultado.append(" ");
+            }
+            resultado.append(Character.toUpperCase(parte.charAt(0)));
+            if (parte.length() > 1) {
+                resultado.append(parte.substring(1));
+            }
+        }
+
+        return resultado.toString();
     }
 }

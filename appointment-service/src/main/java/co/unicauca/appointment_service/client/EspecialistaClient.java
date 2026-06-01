@@ -1,29 +1,28 @@
 package co.unicauca.appointment_service.client;
 
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * Objeto real (RealSubject) del patron Proxy.
- *
- * Realiza la invocacion HTTP efectiva al especialista-service.
  *
  * @author Juan Martin
  */
 @Component
-public class EspecialistaClient implements EspecialistaGateway {
+public class EspecialistaClient {
     private final RestTemplate restTemplate;
+    @Value("${services.especialista.url:http://localhost:8081}")
+    private String especialistaServiceUrl;
 
     public EspecialistaClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    @Override
     @SuppressWarnings("unchecked")
     public Map<String, Object> obtenerEspecialista(String id) {
         return restTemplate.getForObject(
-                "http://localhost:8081/especialistas/" + id,
+                especialistaServiceUrl + "/especialistas/" + id,
                 Map.class
         );
     }

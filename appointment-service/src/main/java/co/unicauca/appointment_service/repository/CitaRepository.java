@@ -18,4 +18,6 @@ public interface CitaRepository extends JpaRepository<Cita, String>{
     boolean existsByEspecialistaIdAndFechaAndHoraAndEstadoNot(String especialistaId, LocalDate fecha, LocalTime hora, EstadoCita estado);
 
     List<Cita> findByFechaAndEspecialistaId(LocalDate fecha, String especialistaId);
+
+    List<Cita> findByPacienteId(int pacienteId);
 }

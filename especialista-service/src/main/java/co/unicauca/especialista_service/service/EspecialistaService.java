@@ -23,13 +23,16 @@ public class EspecialistaService {
             throw new IllegalArgumentException("El especialista no puede ser null");
         }
 
-        if (especialista.getId() == null || especialista.getId().isEmpty()) {
-            throw new IllegalArgumentException("ID inválido");
+        if (especialista.getId() == null || especialista.getId().trim().isEmpty()) {
+            throw new IllegalArgumentException("ID invalido");
         }
 
-        if (especialista.getNombre() == null || especialista.getNombre().isEmpty()) {
-            throw new IllegalArgumentException("Nombre inválido");
+        if (especialista.getNombre() == null || especialista.getNombre().trim().isEmpty()) {
+            throw new IllegalArgumentException("Nombre invalido");
         }
+
+        especialista.setId(especialista.getId().trim());
+        especialista.setNombre(especialista.getNombre().trim().replaceAll("\\s+", " "));
 
         repositorio.guardar(especialista);
     }
