@@ -16,7 +16,7 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 RUN addgroup -S piedrazul && adduser -S piedrazul -G piedrazul
-USER piedrazul
+#USER piedrazul
 
 COPY --from=build /app/target/*.jar app.jar
 

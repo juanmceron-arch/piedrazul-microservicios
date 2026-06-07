@@ -487,7 +487,7 @@ function renderRegistro() {
           <div class="field"><label class="required">Apellido</label><input name="apellido" placeholder="Ej: Perez Gomez" minlength="2" maxlength="60" required /><small class="hint">Use solo letras. Escriba ambos apellidos si aplica.</small></div>
           <div class="field"><label class="required">Contraseña</label><input name="passwordHash" type="password" minlength="6" placeholder="Mínimo 6 caracteres" required /></div>
           <div class="field"><label>Género</label><select name="genero"><option value="MASCULINO">Masculino</option><option value="FEMENINO">Femenino</option><option value="OTRO">Otro</option></select></div>
-          <div class="field"><label>Teléfono</label><input name="telefono" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="Ej: 3001234567" /><small class="hint">Ingrese exactamente 10 números.</small></div>
+          <div class="field"><label class="required">Celular</label><input name="telefono" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="Ej: 3001234567" required /><small class="hint">Ingrese exactamente 10 números.</small></div>
           <div class="field"><label>Fecha nacimiento</label><input name="fechaNacimiento" type="date" value="1998-01-01" /></div>
         </div>
         <div class="field"><label>Correo electrónico</label><input name="correo" type="email" placeholder="Ej: paciente@correo.com" /></div>

@@ -13,11 +13,6 @@ networks:
   piedrazul-net:
     driver: bridge
 
-volumes:
-  auth-data:
-  especialista-data:
-  appointment-data:
-
 services:
 
   # ── auth-service ─────────────────────────────────────────────────────────────
@@ -29,7 +24,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - auth-data:/app/data
+      - ./auth-service:/app/data
     environment:
       SPRING_APPLICATION_NAME: auth-service
       SERVER_PORT: "8080"
@@ -47,7 +42,7 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - especialista-data:/app/data
+      - ./especialista-service:/app/data
     environment:
       SPRING_APPLICATION_NAME: especialista-service
       SERVER_PORT: "8081"
@@ -67,7 +62,7 @@ services:
     ports:
       - "8082:8082"
     volumes:
-      - appointment-data:/app/data
+      - ./appointment-service:/app/data
     environment:
       SPRING_APPLICATION_NAME: appointment-service
       SERVER_PORT: "8082"

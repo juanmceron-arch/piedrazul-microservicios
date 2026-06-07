@@ -10,7 +10,7 @@ import java.sql.Statement;
  * @author Juan Martin
  */
 public class SQLConexionBD {
-     private static final String URL="jdbc:sqlite:especialista.bd";
+     private static final String URL="jdbc:sqlite:/app/data/especialista.bd";
     
     public static Connection SQLiteConexionBD()throws SQLException{
         return DriverManager.getConnection(URL);
