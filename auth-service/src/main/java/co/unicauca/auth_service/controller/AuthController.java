@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 
@@ -35,11 +36,13 @@ public class AuthController {
         return service.login(request);
     }
     
+    @PreAuthorize("hasAnyRole('AGENDADOR', 'PACIENTE')")
     @GetMapping("/pacientes/{id}")
     public PacienteResponse obtenerPaciente(@PathVariable Integer id) {
         return service.obtenerPaciente(id);
     }
 
+    @PreAuthorize("hasRole('AGENDADOR')")
     @GetMapping("/pacientes")
     public List<PacienteResponse> buscarPacientes(@RequestParam String documento) {
         return service.buscarPacientes(documento);

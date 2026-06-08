@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  *
@@ -27,11 +28,9 @@ public class DisponibilidadController {
         this.service = service;
     }
     
+    @PreAuthorize("hasRole('AGENDADOR')")
     @PostMapping("/{especialistaId}")
-    public String configurar(
-            @PathVariable String especialistaId,
-            @RequestBody ConfigurarDisponibilidadDto dto
-    ) {
+    public String configurar(@PathVariable String especialistaId, @RequestBody ConfigurarDisponibilidadDto dto) {
 
         DisponibilidadEspecialista disponibilidad =
                 new DisponibilidadEspecialistaBuilder()
@@ -55,6 +54,7 @@ public class DisponibilidadController {
         return "Disponibilidad configurada";
     }
     
+    @PreAuthorize("hasAnyRole('AGENDADOR', 'PACIENTE')")
     @GetMapping("/{especialistaId}")
     public DisponibilidadEspecialista consultar(@PathVariable String especialistaId) {
         return service.consultarDisponibilidad(especialistaId);

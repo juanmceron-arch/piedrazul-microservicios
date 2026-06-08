@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  *
@@ -40,38 +41,44 @@ public class CitaController {
     private final ConsultarCitaServicio consultarServicio;
     private final HorarioSugeridoServicio horarioServicio;
 
+    @PreAuthorize("hasRole('PACIENTE')")
     @PostMapping("/agendar/paciente")
     public ResponseEntity<?> agendarPaciente(@RequestBody AgendarPacienteRequest req){
         return ResponseEntity.ok(pacienteServicio.agendar(req));
     }
 
+    @PreAuthorize("hasRole('AGENDADOR')")
     @PostMapping("/agendar/agendador")
     public ResponseEntity<?> agendarAgendador(@RequestBody AgendarAgendadorRequest req){
         return ResponseEntity.ok(agendadorServicio.agendar(req));
     }
 
+    @PreAuthorize("hasAnyRole('AGENDADOR', 'PACIENTE')")
     @GetMapping
     public ResponseEntity<?> listar(){
         return ResponseEntity.ok(consultarServicio.listar());
     }
 
+    @PreAuthorize("hasAnyRole('AGENDADOR', 'PACIENTE')")
     @PutMapping("/cancelar/{id}")
     public ResponseEntity<?> cancelar(@PathVariable String id){
         cancelarServicio.cancelar(id);
         return ResponseEntity.ok("Cancelada");
     }
 
+    @PreAuthorize("hasRole('AGENDADOR')")
     @PutMapping("/{id}/estado")
     public ResponseEntity<?> cambiarEstado(@PathVariable String id, @RequestParam EstadoCita estado){
         return ResponseEntity.ok(cambiarEstadoServicio.cambiar(id, estado));
     }
 
+    @PreAuthorize("hasAnyRole('AGENDADOR', 'PACIENTE')")
     @PutMapping("/reagendar/{id}")
     public ResponseEntity<?> reagendar(@PathVariable String id,@RequestBody ReagendarRequest req){
-
         return ResponseEntity.ok(reagendarServicio.reagendar(id, req));
     }
 
+    @PreAuthorize("hasAnyRole('AGENDADOR', 'PACIENTE')")
     @GetMapping("/horarios")
     public ResponseEntity<?> horarios(@RequestParam String especialistaId,@RequestParam LocalDate fecha){
         return ResponseEntity.ok(horarioServicio.obtener(especialistaId, fecha));

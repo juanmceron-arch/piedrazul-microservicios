@@ -18,11 +18,14 @@ public class AuthServiceImpl implements AuthService {
     private final UsuarioRepository repo;
     private final FactoryProducer factoryProducer;
     private final BCryptPasswordEncoder encoder;
+    private final KeycloakAdminService keycloakAdminService;
 
-    public AuthServiceImpl(UsuarioRepository repo, FactoryProducer factory, BCryptPasswordEncoder encoder) {
+
+    public AuthServiceImpl(UsuarioRepository repo, FactoryProducer factory, BCryptPasswordEncoder encoder, KeycloakAdminService keycloakAdminService) {
         this.repo = repo;
         this.factoryProducer = factory;
         this.encoder = encoder;
+        this.keycloakAdminService = keycloakAdminService;
     }
 
     @Override
@@ -39,6 +42,8 @@ public class AuthServiceImpl implements AuthService {
         usuario.setApellido(normalizarNombre(usuario.getApellido()));
 
         usuario.setPasswordHash(encoder.encode(usuario.getPasswordHash()));
+
+        keycloakAdminService.crearUsuario(request);
 
         Usuario guardado = repo.save(usuario);
 

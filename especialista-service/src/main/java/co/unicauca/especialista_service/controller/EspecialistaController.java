@@ -4,6 +4,7 @@ import co.unicauca.especialista_service.DTO.CrearEspecialistaDto;
 import co.unicauca.especialista_service.model.TipoEspecialista;
 import co.unicauca.especialista_service.model.Especialista;
 import co.unicauca.especialista_service.service.EspecialistaService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class EspecialistaController {
         this.service = service;
     }
     
+    @PreAuthorize("hasRole('AGENDADOR')")
     @PostMapping
     public String crearEspecialista(@RequestBody CrearEspecialistaDto dto) {
         if (dto.getEspecialidad() == null || dto.getEspecialidad().isBlank()) {
@@ -37,11 +39,13 @@ public class EspecialistaController {
         return "Especialista creado";
     }
     
+    @PreAuthorize("hasAnyRole('AGENDADOR', 'PACIENTE')")
     @GetMapping
     public List<Especialista> listar() {
         return service.listarEspecialistas();
     }
     
+    @PreAuthorize("hasAnyRole('AGENDADOR', 'PACIENTE')")
     @GetMapping("/{id}")
     public Especialista buscar(@PathVariable String id) {
         return service.buscarEspecialista(id);
