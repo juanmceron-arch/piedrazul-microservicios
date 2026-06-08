@@ -13,7 +13,28 @@ networks:
   piedrazul-net:
     driver: bridge
 
+volumes:
+  keycloak_data:
 services:
+
+  # ── Keycloak ─────────────────────────────────────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.1
+    container_name: piedrazul-keycloak
+    command: start-dev
+    ports:
+      - "8085:8080"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: http://localhost:8085
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    networks:
+      - piedrazul-net
+    restart: unless-stopped
 
   # ── auth-service ─────────────────────────────────────────────────────────────
   auth-service:
@@ -26,11 +47,19 @@ services:
     volumes:
       - ./auth-service:/app/data
     environment:
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://localhost:8085/realms/piedrazul"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: "http://keycloak:8080/realms/piedrazul/protocol/openid-connect/certs"
+      KEYCLOAK_SERVER_URL: "http://keycloak:8080"
+      KEYCLOAK_REALM: "piedrazul"
+      KEYCLOAK_ADMIN_CLIENT_ID: "piedrazul-auth-service"
+      KEYCLOAK_ADMIN_CLIENT_SECRET: "czCjE33VoOwq6G4OuDGyG0dCLRNgU4CR"
       SPRING_APPLICATION_NAME: auth-service
       SERVER_PORT: "8080"
       APP_CORS_ALLOWED_ORIGINS: "http://localhost:5500,http://127.0.0.1:5500"
     networks:
       - piedrazul-net
+    depends_on:
+      - keycloak
     restart: unless-stopped
 
   # ── especialista-service ──────────────────────────────────────────────────────
@@ -44,11 +73,15 @@ services:
     volumes:
       - ./especialista-service:/app/data
     environment:
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://localhost:8085/realms/piedrazul"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: "http://keycloak:8080/realms/piedrazul/protocol/openid-connect/certs"
       SPRING_APPLICATION_NAME: especialista-service
       SERVER_PORT: "8081"
       APP_CORS_ALLOWED_ORIGINS: "http://localhost:5500,http://127.0.0.1:5500"
     networks:
       - piedrazul-net
+    depends_on:
+      - keycloak
     restart: unless-stopped
 
   # ── appointment-service ───────────────────────────────────────────────────────
@@ -67,6 +100,8 @@ services:
       SPRING_APPLICATION_NAME: appointment-service
       SERVER_PORT: "8082"
       # ✅ Estas dos líneas reemplazan "localhost" por los nombres Docker
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://localhost:8085/realms/piedrazul"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: "http://keycloak:8080/realms/piedrazul/protocol/openid-connect/certs"
       SERVICES_AUTH_URL: "http://auth-service:8080"
       SERVICES_ESPECIALISTA_URL: "http://especialista-service:8081"
       APP_CORS_ALLOWED_ORIGINS: "http://localhost:5500,http://127.0.0.1:5500"
@@ -75,6 +110,7 @@ services:
     depends_on:
       - auth-service
       - especialista-service
+      - keycloak
     restart: unless-stopped
 
   # ── frontend-web ──────────────────────────────────────────────────────────────

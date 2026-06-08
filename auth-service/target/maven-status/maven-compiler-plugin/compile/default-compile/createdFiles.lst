@@ -3,7 +3,6 @@ co\unicauca\auth_service\service\ValidationAuthDecorator.class
 co\unicauca\auth_service\config\AuthConfig.class
 co\unicauca\auth_service\model\TipoUsuario.class
 co\unicauca\auth_service\factory\FactoryProducer.class
-co\unicauca\auth_service\config\PasswordConfig.class
 co\unicauca\auth_service\service\LoggingAuthDecorator.class
 co\unicauca\auth_service\DTO\RegisterRequest.class
 co\unicauca\auth_service\exception\GlobalExceptionHandler.class

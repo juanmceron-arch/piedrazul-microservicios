@@ -71,6 +71,30 @@ const ROUTE_PERMISSIONS = {
   registro: ["PUBLIC"]
 };
 
+function parseJwt(token) {
+  const base64Url = token.split(".")[1];
+  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split("")
+      .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+      .join("")
+  );
+
+  return JSON.parse(jsonPayload);
+}
+
+function getRoleFromToken(token) {
+  const payload = parseJwt(token);
+  const roles = payload.realm_access?.roles || [];
+
+  if (roles.includes("AGENDADOR")) return "AGENDADOR";
+  if (roles.includes("PACIENTE")) return "PACIENTE";
+
+  return null;
+}
+
 function getCurrentRole() {
   return String(state.user?.rolUsuario || "").toUpperCase();
 }
@@ -451,15 +475,27 @@ function renderLogin() {
     const form = new FormData(event.currentTarget);
     const payload = { id: Number(form.get("id")), passwordHash: String(form.get("passwordHash")) };
     try {
-      const response = await api.login(payload);
-      if (!response.autenticado) {
-        showAlert(response.mensaje || "Credenciales inválidas", "error");
+      const tokenResponse = await api.login(payload);
+
+      localStorage.setItem("piedrazulAccessToken", tokenResponse.access_token);
+      localStorage.setItem("piedrazulRefreshToken", tokenResponse.refresh_token);
+
+      const tokenPayload = parseJwt(tokenResponse.access_token);
+      const rol = getRoleFromToken(tokenResponse.access_token);
+
+      if (!rol) {
+        showAlert("El usuario no tiene rol válido en Keycloak.", "error");
         return;
       }
+
       state.user = {
-        ...response,
-        nombre: response.nombreUsuario || response.nombre || "",
-        apellido: response.apellidoUsuario || response.apellido || ""
+        idUsuario: Number(tokenPayload.preferred_username),
+        rolUsuario: rol,
+        autenticado: true,
+        nombreUsuario: tokenPayload.given_name || tokenPayload.name || "",
+        apellidoUsuario: tokenPayload.family_name || "",
+        nombre: tokenPayload.given_name || "",
+        apellido: tokenPayload.family_name || ""
       };
 
       saveUser();
@@ -529,9 +565,15 @@ function renderRegistro() {
 
 function logout() {
   state.user = null;
+
+  localStorage.removeItem("piedrazulAccessToken");
+  localStorage.removeItem("piedrazulRefreshToken");
+
   saveUser();
+
   state.especialistas = [];
   state.citas = [];
+
   location.hash = "#/login";
 }
 
