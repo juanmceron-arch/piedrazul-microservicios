@@ -7,7 +7,6 @@ import co.unicauca.appointment_service.model.EstadoCita;
 import co.unicauca.appointment_service.repository.CitaRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
@@ -20,8 +19,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AgendarAgendadorServicio {
-    private static final ZoneId ZONA_NEGOCIO = ZoneId.of("America/Bogota");
-
     private final CitaRepository repo;
     private final EspecialistaClient especialistaClient;
     private final HorarioSugeridoServicio horarioServicio;
@@ -70,7 +67,7 @@ public class AgendarAgendadorServicio {
             throw new RuntimeException("La fecha es obligatoria");
         }
 
-        if (!fecha.isAfter(LocalDate.now(ZONA_NEGOCIO))) {
+        if (!fecha.isAfter(LocalDate.now())) {
             throw new RuntimeException("No se pueden agendar citas para el mismo dia ni en fechas pasadas");
         }
     }

@@ -5,7 +5,6 @@ import co.unicauca.appointment_service.model.Cita;
 import co.unicauca.appointment_service.model.EstadoCita;
 import co.unicauca.appointment_service.repository.CitaRepository;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.UUID;
@@ -17,8 +16,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ReagendarCitaServicio {
-    private static final ZoneId ZONA_NEGOCIO = ZoneId.of("America/Bogota");
-
     private final CitaRepository repo;
     private final HorarioSugeridoServicio horarioServicio;
     private static final Set<EstadoCita> ESTADOS_BLOQUEAN_NUEVA_CITA = EnumSet.of(
@@ -43,7 +40,7 @@ public class ReagendarCitaServicio {
             throw new RuntimeException("Fecha y hora son obligatorias");
         }
 
-        if (!req.getFecha().isAfter(LocalDate.now(ZONA_NEGOCIO))) {
+        if (!req.getFecha().isAfter(LocalDate.now())) {
             throw new RuntimeException("No se pueden reagendar citas para el mismo dia ni en fechas pasadas");
         }
 

@@ -13,15 +13,19 @@ const state = {
   currentRoute: "inicio"
 };
 
-const SPECIALTY_ORDER = ["TERAPIA_NEURAL", "QUIROPRAXIA", "FISIOTERAPIA"];
+const GENERAL_SPECIALTY = "CONSULTA_GENERAL";
+const GENERAL_SPECIALTIES = new Set(["CONSULTA_GENERAL", "MEDICINA_GENERAL"]);
+const SPECIALTY_ORDER = [GENERAL_SPECIALTY, "TERAPIA_NEURAL", "QUIROPRAXIA", "FISIOTERAPIA"];
 const BLOCKING_APPOINTMENT_STATES = new Set(["AGENDADA", "PENDIENTE", "REAGENDADA"]);
 const ATTENDANCE_STATES = new Set(["ASISTIDA", "NO_ASISTIDA"]);
 const manualPatientAutocomplete = { timer: null, requestId: 0 };
 
 const SPECIALTY_LABELS = {
+  CONSULTA_GENERAL: "Consulta General",
   TERAPIA_NEURAL: "Terapia Neural",
   QUIROPRAXIA: "Quiropraxia",
   FISIOTERAPIA: "Fisioterapia",
+  MEDICINA_GENERAL: "Consulta General",
   PSICOLOGIA: "Psicologia",
 };
 
@@ -294,17 +298,21 @@ function getCurrentPatientId() {
   return Number(state.user?.idUsuario || state.user?.id || 0);
 }
 
+function isGeneralSpecialty(value) {
+  return GENERAL_SPECIALTIES.has(String(value || "").trim().toUpperCase());
+}
+
 function hasAnyAppointment(patientId) {
   return state.citas.some(cita => Number(cita.pacienteId) === Number(patientId));
 }
 
-function isAppointmentDateReached(cita) {
-  return Boolean(cita?.fecha) && String(cita.fecha) <= todayIso();
+function isPastAppointment(cita) {
+  return Boolean(cita?.fecha) && String(cita.fecha) < todayIso();
 }
 
 function canMarkAttendance(cita) {
   const estado = String(cita?.estado || "").toUpperCase();
-  return getCurrentRole() === "AGENDADOR" && isAppointmentDateReached(cita) && estado !== "CANCELADA" && !ATTENDANCE_STATES.has(estado);
+  return getCurrentRole() === "AGENDADOR" && isPastAppointment(cita) && estado !== "CANCELADA" && !ATTENDANCE_STATES.has(estado);
 }
 
 function canReagendarAppointment(cita) {
@@ -366,8 +374,10 @@ async function loadCitas({ silent = false } = {}) {
   }
 }
 
-function specialistOptions(selected = "") {
-  const especialistas = state.especialistas;
+function specialistOptions(selected = "", { generalOnly = false } = {}) {
+  const especialistas = generalOnly
+    ? state.especialistas.filter(e => isGeneralSpecialty(e.especialidad))
+    : state.especialistas;
   return [`<option value="">Seleccione...</option>`, ...especialistas.map(e => `<option value="${escapeHtml(e.id)}" ${selected === e.id ? "selected" : ""}>${escapeHtml(e.nombre)} - ${formatSpecialty(e.especialidad)}</option>`)].join("");
 }
 
@@ -396,8 +406,10 @@ function availabilityHtml(disponibilidad) {
   `;
 }
 
-function uniqueSpecialtiesOptions(selected = "") {
-  const values = SPECIALTY_ORDER;
+function uniqueSpecialtiesOptions(selected = "", { generalOnly = false } = {}) {
+  const values = generalOnly
+    ? [GENERAL_SPECIALTY]
+    : SPECIALTY_ORDER;
   return [`<option value="">Seleccione...</option>`, ...values.map(v => `<option value="${escapeHtml(v)}" ${selected === v ? "selected" : ""}>${formatSpecialty(v)}</option>`)].join("");
 }
 
@@ -951,6 +963,7 @@ function renderPortalAgendar() {
     return;
   }
 
+  const firstAppointment = !hasAnyAppointment(patientId);
   const minimumDate = tomorrowIso();
 
   viewRoot.innerHTML = `
@@ -959,7 +972,7 @@ function renderPortalAgendar() {
       <section class="panel">
         <h3>Seleccionar especialista</h3>
         <div class="grid-2">
-          <div class="field"><label class="required">Médico/Terapeuta</label><select name="especialistaId" id="portalDoctor" required>${specialistOptions()}</select></div>
+          <div class="field"><label class="required">Médico/Terapeuta</label><select name="especialistaId" id="portalDoctor" required>${specialistOptions("", { generalOnly: firstAppointment })}</select>${firstAppointment ? `<small class="hint">Para la primera cita solo se muestran profesionales de medicina general.</small>` : ""}</div>
           <div class="field"><label class="required">Fecha</label><input name="fecha" id="portalDate" type="date" min="${minimumDate}" value="${minimumDate}" required /></div>
         </div>
         <div class="actions"><button type="button" class="btn" id="portalSpecialistDetail">Ver detalle del especialista</button></div>
@@ -1098,6 +1111,11 @@ async function createPatientAppointment(slot, button, formEl = $("#portalAppoint
 
   if (slot.fecha <= todayIso()) {
     showAlert("No se pueden agendar citas para el mismo dia.", "error");
+    return;
+  }
+
+  if (!hasAnyAppointment(patientId) && !isGeneralSpecialty(slot.doctor.especialidad)) {
+    showAlert("La primera cita debe ser con medicina general.", "error");
     return;
   }
 
