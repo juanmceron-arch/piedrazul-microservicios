@@ -4,12 +4,15 @@ import co.unicauca.appointment_service.model.Cita;
 import co.unicauca.appointment_service.model.EstadoCita;
 import co.unicauca.appointment_service.repository.CitaRepository;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.EnumSet;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CambiarEstadoCitaServicio {
+    private static final ZoneId ZONA_NEGOCIO = ZoneId.of("America/Bogota");
+
     private static final Set<EstadoCita> ESTADOS_ASISTENCIA = EnumSet.of(
             EstadoCita.ASISTIDA,
             EstadoCita.NO_ASISTIDA
@@ -28,8 +31,8 @@ public class CambiarEstadoCitaServicio {
 
         Cita cita = repo.findById(id).orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
-        if (!cita.getFecha().isBefore(LocalDate.now())) {
-            throw new RuntimeException("Solo se puede marcar asistencia despues de la fecha de la cita");
+        if (cita.getFecha().isAfter(LocalDate.now(ZONA_NEGOCIO))) {
+            throw new RuntimeException("Solo se puede marcar asistencia desde la fecha de la cita");
         }
 
         if (cita.getEstado() == EstadoCita.CANCELADA) {
