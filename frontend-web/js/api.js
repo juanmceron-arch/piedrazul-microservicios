@@ -9,8 +9,84 @@ const API_URLS = window.PIEDRAZUL_API_URLS || {
 };
 
 const api = (() => {
-  async function request(base, path, options = {}) {
+  function parseJwtPayload(token) {
+    if (!token) return null;
+
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      return JSON.parse(decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      ));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function isTokenExpiring(token) {
+    const payload = parseJwtPayload(token);
+    if (!payload?.exp) return true;
+
+    const expiresAtMs = payload.exp * 1000;
+    return expiresAtMs - Date.now() < 30000;
+  }
+
+  function clearSession() {
+    localStorage.removeItem("piedrazulAccessToken");
+    localStorage.removeItem("piedrazulRefreshToken");
+    localStorage.removeItem("piedrazulUser");
+  }
+
+  async function refreshAccessToken() {
+    const refreshToken = localStorage.getItem("piedrazulRefreshToken");
+    if (!refreshToken) return null;
+
+    const body = new URLSearchParams();
+    body.append("client_id", KEYCLOAK_CLIENT_ID);
+    body.append("grant_type", "refresh_token");
+    body.append("refresh_token", refreshToken);
+
+    const response = await fetch(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body
+    });
+
+    if (!response.ok) {
+      clearSession();
+      return null;
+    }
+
+    const tokenResponse = await response.json();
+    localStorage.setItem("piedrazulAccessToken", tokenResponse.access_token);
+    localStorage.setItem("piedrazulRefreshToken", tokenResponse.refresh_token);
+
+    return tokenResponse.access_token;
+  }
+
+  async function getAccessToken() {
     const token = localStorage.getItem("piedrazulAccessToken");
+    if (!token) return null;
+
+    if (!isTokenExpiring(token)) {
+      return token;
+    }
+
+    return await refreshAccessToken();
+  }
+
+  async function request(base, path, options = {}) {
+    const hadSession = Boolean(localStorage.getItem("piedrazulAccessToken"));
+    const token = await getAccessToken();
+
+    if (hadSession && !token) {
+      throw new Error("Sesion expirada. Inicie sesion nuevamente.");
+    }
 
     const response = await fetch(`${base}${path}`, {
       headers: {

@@ -9,6 +9,7 @@ import co.unicauca.appointment_service.model.TipoGenero;
 import co.unicauca.appointment_service.repository.CitaRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AgendarPacienteServicio {
+    private static final ZoneId ZONA_NEGOCIO = ZoneId.of("America/Bogota");
+
     private final CitaRepository repo;
     private final PacienteClient pacienteClient;
     private final EspecialistaClient especialistaClient;
@@ -46,7 +49,6 @@ public class AgendarPacienteServicio {
         Map<String, Object> especialista = especialistaClient.obtenerEspecialista(req.getEspecialistaId());
         String especialidad = valorComoTexto(especialista, "especialidad", "");
 
-        validarPrimeraCitaMedicinaGeneral(req.getPacienteId(), especialidad);
         validarHorarioDisponible(req.getEspecialistaId(), req.getFecha(), req.getHora());
 
         Cita cita = new Cita();
@@ -74,7 +76,7 @@ public class AgendarPacienteServicio {
             throw new RuntimeException("La fecha es obligatoria");
         }
 
-        if (!fecha.isAfter(LocalDate.now())) {
+        if (!fecha.isAfter(LocalDate.now(ZONA_NEGOCIO))) {
             throw new RuntimeException("No se pueden agendar citas para el mismo dia ni en fechas pasadas");
         }
     }
@@ -99,19 +101,6 @@ public class AgendarPacienteServicio {
         if (!disponible) {
             throw new RuntimeException("El horario seleccionado no esta disponible para el especialista");
         }
-    }
-
-    private void validarPrimeraCitaMedicinaGeneral(int pacienteId, String especialidad) {
-        boolean esPrimeraCita = repo.findByPacienteId(pacienteId).isEmpty();
-
-        if (esPrimeraCita && !esMedicinaGeneral(especialidad)) {
-            throw new RuntimeException("La primera cita del paciente debe ser con medicina general");
-        }
-    }
-
-    private boolean esMedicinaGeneral(String especialidad) {
-        String normalizada = String.valueOf(especialidad).trim().toUpperCase();
-        return normalizada.equals("CONSULTA_GENERAL") || normalizada.equals("MEDICINA_GENERAL");
     }
 
     private String valorComoTexto(Map<String, Object> map, String key, String fallback) {

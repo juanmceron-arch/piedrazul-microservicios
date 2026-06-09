@@ -6,6 +6,7 @@ import co.unicauca.appointment_service.repository.CitaRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class HorarioSugeridoServicio {
+    private static final ZoneId ZONA_NEGOCIO = ZoneId.of("America/Bogota");
+
     private final CitaRepository repo;
     private final DisponibilidadClient disponibilidadClient;
 
@@ -26,7 +29,9 @@ public class HorarioSugeridoServicio {
     }
 
     public List<LocalTime> obtener(String especialistaId, LocalDate fecha) {
-        if (fecha == null || !fecha.isAfter(LocalDate.now())) {
+        LocalDate hoy = LocalDate.now(ZONA_NEGOCIO);
+
+        if (fecha == null || !fecha.isAfter(hoy)) {
             return List.of();
         }
 
@@ -36,7 +41,7 @@ public class HorarioSugeridoServicio {
         }
 
         int semanasHabilitadas = numero(disponibilidad.get("semanasHabilitadas"), 0);
-        if (semanasHabilitadas > 0 && fecha.isAfter(LocalDate.now().plusWeeks(semanasHabilitadas))) {
+        if (semanasHabilitadas > 0 && fecha.isAfter(hoy.plusWeeks(semanasHabilitadas))) {
             return List.of();
         }
 
